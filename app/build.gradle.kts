@@ -30,11 +30,11 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.github.jqssun.airplay"
+        applicationId = "app.airplayjd"
         minSdk = 23
         targetSdk = 37
         versionCode = 36
-        versionName = "0.0.36"
+        versionName = "0.0.36-jd1"
 
         externalNativeBuild {
             cmake {
