@@ -48,7 +48,6 @@ import kotlin.math.max
 
 val LocalHazeState = staticCompositionLocalOf<HazeState?> { null }
 
-// below Android 12 there is no RenderEffect blur, so glass falls back to an opaque fill
 val blurSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
 private data class Blob(val x: Float, val y: Float, val radius: Float, val color: Color)
@@ -95,7 +94,6 @@ fun Wall(
     }
 }
 
-// tv layouts are drawn for a 960x540 canvas; narrow windows (phones) stack instead
 fun BoxWithConstraintsScope.isWide(): Boolean = maxWidth >= 720.dp
 
 @Composable

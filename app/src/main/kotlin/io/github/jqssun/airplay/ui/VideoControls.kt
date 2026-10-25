@@ -27,6 +27,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.union
@@ -49,6 +51,7 @@ import androidx.compose.material.icons.rounded.PictureInPictureAlt
 import androidx.compose.material.icons.rounded.PlayArrow
 import androidx.compose.material.icons.rounded.ScreenRotation
 import androidx.compose.material.icons.rounded.Speed
+import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.ripple.RippleAlpha
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -97,6 +100,14 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import io.github.jqssun.airplay.R
+import io.github.jqssun.airplay.ui.design.ChipKind
+import io.github.jqssun.airplay.ui.design.GlassIconButton
+import io.github.jqssun.airplay.ui.design.StatusChip
+import io.github.jqssun.airplay.ui.design.TrackBar
+import io.github.jqssun.airplay.ui.design.glass
+import io.github.jqssun.airplay.ui.design.isWide
+import io.github.jqssun.airplay.ui.theme.Jd
+import io.github.jqssun.airplay.ui.theme.JdType
 import io.github.jqssun.airplay.ui.gestures.VideoContentScale
 import io.github.jqssun.airplay.viewmodel.MainViewModel
 import kotlin.math.abs
@@ -159,178 +170,119 @@ fun PlayerButton(
 }
 
 @Composable
-fun PlayPauseButton(playing: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier) {
-    PlayerButton(modifier = modifier.size(64.dp), onClick = onClick) {
-        Icon(
-            imageVector = if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
-            contentDescription = stringResource(R.string.cd_play_pause),
-            modifier = Modifier.size(48.dp)
-        )
-    }
-}
-
-@Composable
-fun VideoControlsTop(
+fun VideoPanel(
     title: String,
+    source: String,
+    playing: Boolean,
+    positionMs: Long,
+    durationMs: Long,
     videoUrl: String?,
     downloadProgress: Int?,
     showDownload: Boolean,
-    onBackClick: () -> Unit,
-    onSpeedClick: () -> Unit,
-    onDownloadClick: () -> Unit,
-    modifier: Modifier = Modifier,
-) {
-    val insets = WindowInsets.systemBars.union(WindowInsets.displayCutout).asPaddingValues()
-    val layoutDirection = LocalLayoutDirection.current
-    val extraTopPadding = if (insets.calculateTopPadding() == 0.dp) 16.dp else 0.dp
-    Row(
-        modifier = modifier
-            .padding(
-                start = insets.calculateStartPadding(layoutDirection),
-                top = insets.calculateTopPadding(),
-                end = insets.calculateEndPadding(layoutDirection),
-            )
-            .padding(horizontal = 8.dp)
-            .padding(bottom = 16.dp)
-            .padding(top = extraTopPadding),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        PlayerButton(onClick = onBackClick) {
-            Icon(Icons.AutoMirrored.Rounded.ArrowBack, contentDescription = stringResource(R.string.cd_back))
-        }
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium,
-            color = Color.White,
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f),
-        )
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            PlayerButton(onClick = onSpeedClick) {
-                Icon(Icons.Rounded.Speed, contentDescription = stringResource(R.string.select_playback_speed))
-            }
-            if (videoUrl != null) {
-                val clipboard = LocalClipboardManager.current
-                PlayerButton(onClick = { clipboard.setText(AnnotatedString(videoUrl)) }) {
-                    Icon(Icons.Rounded.ContentCopy, contentDescription = stringResource(R.string.cd_copy_url))
-                }
-            }
-            if (showDownload) {
-                PlayerButton(onClick = onDownloadClick) {
-                    when {
-                        downloadProgress == null -> Icon(
-                            Icons.Rounded.Download,
-                            contentDescription = stringResource(R.string.cd_download)
-                        )
-                        downloadProgress < 0 -> CircularProgressIndicator(
-                            color = Color.White,
-                            strokeWidth = 3.dp,
-                            modifier = Modifier.size(24.dp)
-                        )
-                        else -> CircularProgressIndicator(
-                            progress = { downloadProgress / 100f },
-                            color = Color.White,
-                            trackColor = Color.White.copy(alpha = 0.3f),
-                            strokeWidth = 3.dp,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun VideoControlsBottom(
-    positionMs: Long,
-    durationMs: Long,
     contentScale: VideoContentScale,
     isPipSupported: Boolean,
-    onRotateClick: () -> Unit,
+    showRotate: Boolean,
+    onPlayPause: () -> Unit,
+    onStop: () -> Unit,
+    onSpeedClick: () -> Unit,
+    onDownloadClick: () -> Unit,
     onLockClick: () -> Unit,
     onContentScaleClick: () -> Unit,
     onPipClick: () -> Unit,
+    onRotateClick: () -> Unit,
     onSeek: (Long) -> Unit,
     onSeekEnd: () -> Unit,
     modifier: Modifier = Modifier,
+    playPauseModifier: Modifier = Modifier,
     seekBarModifier: Modifier = Modifier,
 ) {
-    val insets = WindowInsets.systemBars.union(WindowInsets.displayCutout).asPaddingValues()
-    val layoutDirection = LocalLayoutDirection.current
-    Column(
-        modifier = modifier
-            .padding(
-                start = insets.calculateStartPadding(layoutDirection),
-                end = insets.calculateEndPadding(layoutDirection),
-                bottom = insets.calculateBottomPadding(),
-            )
-            .padding(horizontal = 8.dp)
-            .padding(top = 16.dp)
-            .padding(bottom = 16.dp.takeIf { insets.calculateBottomPadding() == 0.dp } ?: 0.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            var showRemaining by rememberSaveable { mutableStateOf(false) }
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                ) { showRemaining = !showRemaining },
-            ) {
-                Text(
-                    text = if (showRemaining) "-${formatVideoTime(durationMs - positionMs)}" else formatVideoTime(positionMs),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
-                )
-                Text(text = " / ", style = MaterialTheme.typography.bodyMedium, color = Color.White)
-                Text(
-                    text = formatVideoTime(durationMs),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            PlayerButton(modifier = Modifier.size(30.dp), onClick = onRotateClick) {
-                Icon(
-                    Icons.Rounded.ScreenRotation,
-                    contentDescription = stringResource(R.string.cd_rotate),
-                    modifier = Modifier.size(20.dp),
-                )
-            }
-        }
-        PlayerSeekbar(
-            positionMs = positionMs,
-            durationMs = durationMs,
-            onSeek = onSeek,
-            onSeekEnd = onSeekEnd,
-            modifier = seekBarModifier,
-        )
-        Row(
+    BoxWithConstraints(modifier.fillMaxWidth().windowInsetsPadding(WindowInsets.safeDrawing)) {
+        val wide = isWide()
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp, alignment = Alignment.Start),
+                .padding(
+                    start = if (wide) Jd.SafeX else Jd.Space4,
+                    end = if (wide) Jd.SafeX else Jd.Space4,
+                    bottom = if (wide) Jd.SafeY else Jd.Space4,
+                )
+                .glass(Jd.ShapeLg, strong = true, blur = false)
+                .padding(start = Jd.Space8, end = Jd.Space8, top = 20.dp, bottom = Jd.Space6),
+            verticalArrangement = Arrangement.spacedBy(Jd.Space3),
         ) {
-            PlayerButton(onClick = onLockClick) {
-                Icon(Icons.Rounded.LockOpen, contentDescription = stringResource(R.string.cd_lock_controls))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Jd.Space6)) {
+                Column(Modifier.weight(1f)) {
+                    Text(title, style = JdType.PlayerTitle, color = Jd.Ink, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(source, style = JdType.Callout, color = Jd.InkMuted, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                }
+                StatusChip(stringResource(R.string.chip_streaming), ChipKind.LIVE)
             }
-            PlayerButton(onClick = onContentScaleClick) {
-                Icon(contentScale.icon(), contentDescription = stringResource(contentScale.nameRes()))
+            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(Jd.Space4)) {
+                GlassIconButton(
+                    icon = if (playing) Icons.Rounded.Pause else Icons.Rounded.PlayArrow,
+                    contentDescription = stringResource(R.string.cd_play_pause),
+                    onClick = onPlayPause,
+                    modifier = playPauseModifier,
+                )
+                Text(formatVideoTime(positionMs), style = JdType.CaptionStrong, color = Jd.InkMuted)
+                PlayerSeekbar(
+                    positionMs = positionMs,
+                    durationMs = durationMs,
+                    onSeek = onSeek,
+                    onSeekEnd = onSeekEnd,
+                    modifier = seekBarModifier.weight(1f),
+                )
+                Text(
+                    "−" + formatVideoTime((durationMs - positionMs).coerceAtLeast(0)),
+                    style = JdType.CaptionStrong,
+                    color = Jd.InkMuted,
+                )
+                GlassIconButton(Icons.Rounded.Stop, stringResource(R.string.cd_stop), onStop)
             }
-            if (isPipSupported) {
-                PlayerButton(onClick = onPipClick) {
-                    Icon(Icons.Rounded.PictureInPictureAlt, contentDescription = stringResource(R.string.cd_pip))
+            Row(
+                modifier = Modifier.horizontalScroll(rememberScrollState()),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(Jd.Space2),
+            ) {
+                GlassIconButton(Icons.Rounded.Speed, stringResource(R.string.select_playback_speed), onSpeedClick)
+                GlassIconButton(contentScale.icon(), stringResource(contentScale.nameRes()), onContentScaleClick)
+                GlassIconButton(Icons.Rounded.LockOpen, stringResource(R.string.cd_lock_controls), onLockClick)
+                if (videoUrl != null) {
+                    val clipboard = LocalClipboardManager.current
+                    GlassIconButton(
+                        Icons.Rounded.ContentCopy,
+                        stringResource(R.string.cd_copy_url),
+                        { clipboard.setText(AnnotatedString(videoUrl)) },
+                    )
+                }
+                if (showDownload) {
+                    GlassIconButton(Icons.Rounded.Download, stringResource(R.string.cd_download), onDownloadClick) {
+                        when {
+                            downloadProgress == null -> Icon(
+                                Icons.Rounded.Download,
+                                contentDescription = stringResource(R.string.cd_download),
+                                modifier = Modifier.size(24.dp),
+                            )
+                            downloadProgress < 0 -> CircularProgressIndicator(
+                                color = LocalContentColor.current,
+                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(24.dp),
+                            )
+                            else -> CircularProgressIndicator(
+                                progress = { downloadProgress / 100f },
+                                color = LocalContentColor.current,
+                                trackColor = LocalContentColor.current.copy(alpha = 0.3f),
+                                strokeWidth = 3.dp,
+                                modifier = Modifier.size(24.dp),
+                            )
+                        }
+                    }
+                }
+                if (isPipSupported) {
+                    GlassIconButton(Icons.Rounded.PictureInPictureAlt, stringResource(R.string.cd_pip), onPipClick)
+                }
+                if (showRotate) {
+                    GlassIconButton(Icons.Rounded.ScreenRotation, stringResource(R.string.cd_rotate), onRotateClick)
                 }
             }
         }
@@ -374,31 +326,15 @@ private fun PlayerSeekbar(
                     modifier = Modifier
                         .size(thumbSize)
                         .shadow(4.dp, CircleShape)
-                        .background(Color.White)
-                        .then(
-                            if (isFocused) {
-                                Modifier.border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-                            } else Modifier
-                        ),
+                        .background(Jd.Ink)
+                        .then(if (isFocused) Modifier.border(3.dp, Jd.Signal, CircleShape) else Modifier),
                 )
             },
             track = {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp)
-                        .clip(MaterialTheme.shapes.extraSmall)
-                        .background(Color.White.copy(alpha = 0.5f))
-                ) {
-                    if (durationMs > 0) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth((positionMs.toFloat() / durationMs).coerceIn(0f, 1f))
-                                .height(4.dp)
-                                .background(MaterialTheme.colorScheme.primary)
-                        )
-                    }
-                }
+                TrackBar(
+                    fraction = if (durationMs > 0) positionMs.toFloat() / durationMs else 0f,
+                    modifier = Modifier.fillMaxWidth(),
+                )
             }
         )
     }
