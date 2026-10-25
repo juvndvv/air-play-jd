@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Vídeo con controles</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/airplayjd/tokens.css">
+<link rel="stylesheet" href="ds/airplayjd/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#f5f5f7}a:hover{color:#c7c7cc}
+</style>
+</helmet>
+<div class="rt-player rt-wall" style="width: 960px; height: 540px; font-family: Inter, system-ui, sans-serif; color: #f5f5f7;">
+  <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; gap: 8px; color: #c7c7cc; font-size: 14px; line-height: 18px;">
+    <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true" style="fill: #7c7c82;"><path d="M4 5h16v14H4zm2 2v10h12V7zm3 2 6 3-6 3z"></path></svg>
+    <span>[Fotograma del vídeo a pantalla completa]</span>
+  </div>
+  <div class="rt-player__panel rt-glass rt-glass--strong">
+    <div class="rt-player__top">
+      <div>
+        <div class="rt-player__title">Vacaciones en Cádiz</div>
+        <div class="rt-player__src">Desde iPhone de Ana · 1080p</div>
+      </div>
+      <span class="rt-chip rt-glass rt-chip--live"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle></svg><span>Transmitiendo</span></span>
+    </div>
+    <div class="rt-player__row">
+      <button class="rt-iconbtn rt-glass rt-focusable is-focused" aria-label="Pausa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg></button>
+      <span class="rt-player__time">1:42</span>
+      <div class="rt-track"><div class="rt-track__fill" style="width: 38%;"></div></div>
+      <span class="rt-player__time" style="text-align: right;">−2:48</span>
+      <a href="Main.dc.html" class="rt-iconbtn rt-glass rt-focusable" aria-label="Detener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6h12v12H6z"></path></svg></a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":540}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

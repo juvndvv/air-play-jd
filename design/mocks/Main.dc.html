@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Espera</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/airplayjd/tokens.css">
+<link rel="stylesheet" href="ds/airplayjd/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#f5f5f7}a:hover{color:#c7c7cc}
+</style>
+</helmet>
+<div class="rt-wall" style="width: 960px; height: 540px; box-sizing: border-box; padding: 27px 48px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: Inter, system-ui, sans-serif; color: #f5f5f7;">
+  <div style="align-self: stretch; display: flex; justify-content: space-between; align-items: center;">
+    <img src="/_blob/541defb4d95cb92f29c4303ca781da0f" alt="Air Play JD" style="height: 28px;">
+    <span class="rt-chip rt-glass rt-chip--idle"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle></svg><span>Esperando</span></span>
+  </div>
+  <div class="rt-glass" style="margin-top: 36px; padding: 32px 56px; border-radius: 32px; display: flex; flex-direction: column; align-items: center; gap: 12px;">
+    <h1 style="position: relative; margin: 0; font-size: 40px; line-height: 46px; font-weight: 700; letter-spacing: -0.8px;">Listo para recibir</h1>
+    <p style="position: relative; margin: 0; font-size: 18px; line-height: 24px; color: #c7c7cc; max-width: 440px; text-wrap: balance;">En tu iPhone, abre el Centro de control, toca Duplicar pantalla y elige este televisor.</p>
+    <p style="position: relative; margin: 4px 0 0; font-size: 22px; line-height: 28px; font-weight: 600; color: #fc5858;">TV del salón</p>
+  </div>
+  <div style="margin-top: auto; display: flex; gap: 24px; align-items: flex-end;">
+    <a href="Request.dc.html" class="rt-card rt-focusable is-focused" style="width: 150px; text-decoration: none;"><span class="rt-card__art rt-glass"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h8V5zm3 14.5h2v1h-2z"></path></svg></span><span class="rt-card__title">iPhone de Ana</span></a>
+    <a href="Request.dc.html" class="rt-card rt-focusable" style="width: 150px; text-decoration: none;"><span class="rt-card__art rt-glass"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v12H3zm2 2v8h14V6zM8 19h8v2H8z"></path></svg></span><span class="rt-card__title">MacBook de Leo</span></a>
+    <a href="Settings.dc.html" class="rt-card rt-focusable" style="width: 150px; text-decoration: none;"><span class="rt-card__art rt-glass"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h11v2H3zm15 0h3v2h-3zM3 16h3v2H3zm7 0h11v2H10z"></path><circle cx="16" cy="7" r="2.5"></circle><circle cx="8" cy="17" r="2.5"></circle></svg></span><span class="rt-card__title">Ajustes</span></a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":540}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

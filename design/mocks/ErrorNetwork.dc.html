@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Error: sin red</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/airplayjd/tokens.css">
+<link rel="stylesheet" href="ds/airplayjd/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#f5f5f7}a:hover{color:#c7c7cc}
+</style>
+</helmet>
+<div class="rt-wall" style="width: 960px; height: 540px; box-sizing: border-box; padding: 27px 48px; display: flex; flex-direction: column; align-items: center; text-align: center; font-family: Inter, system-ui, sans-serif; color: #f5f5f7;">
+  <div style="align-self: stretch; display: flex; justify-content: space-between; align-items: center;">
+    <img src="/_blob/541defb4d95cb92f29c4303ca781da0f" alt="Air Play JD" style="height: 28px;">
+    <span class="rt-chip rt-glass rt-chip--error"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1 13 12H1zm-.8 4v3.4h1.6V5zm0 4.4V11h1.6V9.4z"></path></svg><span>Sin red</span></span>
+  </div>
+  <div class="rt-glass rt-glass--strong" role="alert" style="margin-top: 40px; width: 560px; box-sizing: border-box; padding: 36px 48px 32px; border-radius: 32px; display: flex; flex-direction: column; align-items: center; gap: 14px;">
+    <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" style="position: relative; fill: #fc5858;"><path d="M12 4C7.3 4 3.1 5.8 0 8.8L12 21 24 8.8C20.9 5.8 16.7 4 12 4zm-1 5h2v5h-2zm0 6h2v2h-2z"></path></svg>
+    <h1 style="position: relative; margin: 0; font-size: 28px; line-height: 34px; font-weight: 700; letter-spacing: -0.4px;">El televisor no está conectado a una red Wi-Fi</h1>
+    <p style="position: relative; margin: 0; font-size: 18px; line-height: 24px; color: #c7c7cc; max-width: 440px;">Conecta la TV y tu iPhone a la misma red Wi-Fi para poder enviar contenido.</p>
+    <div style="position: relative; margin-top: 8px; display: flex; gap: 16px;">
+      <button class="rt-btn rt-glass rt-focusable is-focused">Abrir ajustes de red</button>
+      <a href="Main.dc.html" class="rt-btn rt-glass rt-focusable" style="text-decoration: none;"><span>Reintentar</span></a>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":540}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

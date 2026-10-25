@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Audio con metadatos</title>
+<script src="./support.js"></script>
+<link rel="stylesheet" href="ds/airplayjd/tokens.css">
+<link rel="stylesheet" href="ds/airplayjd/components/bundle.css">
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+body{margin:0}
+a{color:#f5f5f7}a:hover{color:#c7c7cc}
+</style>
+</helmet>
+<div class="rt-wall" style="position: relative; width: 960px; height: 540px; box-sizing: border-box; padding: 27px 48px; display: flex; flex-direction: column; font-family: Inter, system-ui, sans-serif; color: #f5f5f7;">
+  <div style="display: flex; justify-content: space-between; align-items: center;">
+    <img src="/_blob/541defb4d95cb92f29c4303ca781da0f" alt="Air Play JD" style="height: 28px;">
+    <span class="rt-chip rt-glass rt-chip--live"><svg viewBox="0 0 14 14" aria-hidden="true"><circle cx="7" cy="7" r="5"></circle></svg><span>Transmitiendo audio</span></span>
+  </div>
+  <div style="flex-grow: 1; display: flex; align-items: center; gap: 48px; padding: 0 24px;">
+    <div class="rt-glass" style="width: 280px; height: 280px; flex: none; border-radius: 32px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.22);">
+      <svg viewBox="0 0 24 24" width="48" height="48" aria-hidden="true" style="position: relative; fill: #c7c7cc;"><path d="M9 3v11.3A3.5 3.5 0 1 0 11 17V7h8V3z"></path></svg>
+      <span style="position: relative; font-size: 14px; line-height: 18px; color: #c7c7cc;">[Carátula del álbum]</span>
+    </div>
+    <div style="flex-grow: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px;">
+      <span style="font-size: 14px; line-height: 18px; font-weight: 500; color: #c7c7cc;">Desde MacBook de Leo · Apple Music</span>
+      <h1 style="margin: 0; font-size: 40px; line-height: 46px; font-weight: 700; letter-spacing: -0.8px;">[Título de la canción]</h1>
+      <p style="margin: 0; font-size: 22px; line-height: 28px; font-weight: 600; color: #c7c7cc;">[Artista] · [Álbum]</p>
+      <div style="margin-top: 28px; display: flex; align-items: center; gap: 16px;">
+        <span class="rt-player__time">0:58</span>
+        <div class="rt-track"><div class="rt-track__fill" style="width: 27%;"></div></div>
+        <span class="rt-player__time" style="text-align: right;">−2:37</span>
+      </div>
+      <div style="margin-top: 20px; display: flex; gap: 16px;">
+        <button class="rt-iconbtn rt-glass rt-focusable" aria-label="Anterior"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h2v14H6zm3 7 9-7v14z"></path></svg></button>
+        <button class="rt-iconbtn rt-glass rt-focusable is-focused" aria-label="Pausa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 5h4v14H6zM14 5h4v14h-4z"></path></svg></button>
+        <button class="rt-iconbtn rt-glass rt-focusable" aria-label="Siguiente"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 5h2v14h-2zM6 5l9 7-9 7z"></path></svg></button>
+      </div>
+    </div>
+  </div>
+  <p style="margin: 0; font-size: 14px; line-height: 18px; color: #c7c7cc;">Tras 2 min sin tocar el mando, la pantalla se atenúa para proteger el televisor.</p>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":960,"height":540}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{
+  "v": 3,
+  "createdOnFiles": {"v": 1, "at": "2026-10-25T11:19:00Z"},
+  "title": "Air Play JD — Pantallas",
+  "launch": {"view": "canvas"},
+  "pages": [],
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 960, "h": 540, "title": "1 · Espera"},
+    "Request.dc.html": {"x": 1040, "y": 0, "w": 960, "h": 540, "title": "2 · Solicitud de conexión"},
+    "Pin.dc.html": {"x": 2080, "y": 0, "w": 960, "h": 540, "title": "3 · Código de emparejamiento"},
+    "Mirroring.dc.html": {"x": 0, "y": 920, "w": 960, "h": 540, "title": "4 · Duplicado de pantalla"},
+    "Video.dc.html": {"x": 1040, "y": 920, "w": 960, "h": 540, "title": "5 · Vídeo con controles"},
+    "Audio.dc.html": {"x": 2080, "y": 920, "w": 960, "h": 540, "title": "6 · Audio con metadatos"},
+    "Settings.dc.html": {"x": 0, "y": 1840, "w": 960, "h": 540, "title": "7 · Ajustes"},
+    "ErrorNetwork.dc.html": {"x": 1040, "y": 1840, "w": 960, "h": 540, "title": "8 · Error: sin red"},
+    "ErrorLost.dc.html": {"x": 2080, "y": 1840, "w": 960, "h": 540, "title": "9 · Error: conexión perdida"},
+    "Screensaver.dc.html": {"x": 3120, "y": 0, "w": 960, "h": 540, "title": "10 · Salvapantallas (espera tras 2 min)"},
+    "Devices.dc.html": {"x": 3120, "y": 1840, "w": 960, "h": 540, "title": "11 · Dispositivos permitidos"}
+  },
+  "order": ["Main.dc.html", "Request.dc.html", "Pin.dc.html", "Mirroring.dc.html", "Video.dc.html", "Audio.dc.html", "Settings.dc.html", "ErrorNetwork.dc.html", "ErrorLost.dc.html", "Screensaver.dc.html", "Devices.dc.html"],
+  "notes": {
+    "t1": {"x": 0, "y": -260, "text": "Conectar un dispositivo", "kind": "title1", "maxW": 4080},
+    "t2": {"x": 0, "y": 660, "text": "Recibir contenido", "kind": "title1", "maxW": 3040},
+    "t3": {"x": 0, "y": 1580, "text": "Ajustes y errores", "kind": "title1", "maxW": 4080}
+  },
+  "designSystems": [
+    {"title": "Air Play JD", "namespace": "airplayjd", "artifact": "https://claude.ai/artifact/6nancAmD3HzieqHsU26a91", "version": "1792926952-559a", "copiedAt": "2026-10-25T11:19:00Z"}
+  ]
+}
