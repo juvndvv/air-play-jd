@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.AirPlayServer" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.AirPlayServer" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/jd_bg</item>
+        <item name="android:colorAccent">@color/jd_signal</item>
+    </style>
 </resources>
