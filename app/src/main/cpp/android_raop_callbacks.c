@@ -69,6 +69,7 @@ void android_callbacks_init(android_callback_ctx_t *ctx, JNIEnv *env, jobject ca
     ctx->on_video_rate = (*env)->GetMethodID(env, cls, "onVideoRate", "(F)V");
     ctx->on_video_stop = (*env)->GetMethodID(env, cls, "onVideoStop", "()V");
     ctx->on_video_session_poll = (*env)->GetMethodID(env, cls, "onVideoSessionPoll", "()V");
+    ctx->on_client_request = (*env)->GetMethodID(env, cls, "onClientRequest", "([B[B[B)Z");
     (*env)->DeleteLocalRef(env, cls);
 }
 
@@ -191,6 +192,33 @@ static void _display_pin(void *cls, char *pin) {
     jstring jpin = (*env)->NewStringUTF(env, pin);
     (*env)->CallVoidMethod(env, ctx->callback_obj, ctx->on_display_pin, jpin);
     (*env)->DeleteLocalRef(env, jpin);
+}
+
+static jbyteArray _utf8_bytes(JNIEnv *env, const char *s) {
+    jsize len = s ? (jsize)strlen(s) : 0;
+    jbyteArray arr = (*env)->NewByteArray(env, len);
+    if (arr && len > 0) (*env)->SetByteArrayRegion(env, arr, 0, len, (const jbyte *)s);
+    return arr;
+}
+
+static void _report_client_request(void *cls, char *deviceid, char *model, char *name, bool *admit) {
+    android_callback_ctx_t *ctx = (android_callback_ctx_t *)cls;
+    JNIEnv *env = _get_env(ctx);
+    if (!env) return;
+    jbyteArray jid = _utf8_bytes(env, deviceid);
+    jbyteArray jmodel = _utf8_bytes(env, model);
+    jbyteArray jname = _utf8_bytes(env, name);
+    jboolean allowed = (*env)->CallBooleanMethod(env, ctx->callback_obj, ctx->on_client_request, jid, jmodel, jname);
+    if ((*env)->ExceptionCheck(env)) {
+        (*env)->ExceptionDescribe(env);
+        (*env)->ExceptionClear(env);
+        allowed = JNI_FALSE;
+    }
+    *admit = allowed == JNI_TRUE;
+    LOGI("client request %s: %s", deviceid ? deviceid : "?", *admit ? "admitted" : "rejected");
+    (*env)->DeleteLocalRef(env, jid);
+    (*env)->DeleteLocalRef(env, jmodel);
+    (*env)->DeleteLocalRef(env, jname);
 }
 
 /* Stubs for less critical callbacks */
@@ -413,6 +441,7 @@ void android_callbacks_fill(raop_callbacks_t *cbs, android_callback_ctx_t *ctx) 
     cbs->video_report_size = _video_report_size;
     cbs->mirror_video_running = _mirror_video_running;
     cbs->display_pin = _display_pin;
+    cbs->report_client_request = _report_client_request;
     cbs->video_set_codec = _video_set_codec;
     cbs->on_video_play = _video_play;
     cbs->on_video_wait_ready = _video_wait_ready;

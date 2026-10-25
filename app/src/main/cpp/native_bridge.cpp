@@ -164,6 +164,16 @@ Java_io_github_jqssun_airplay_bridge_NativeBridge_nativeStop(
 
 extern "C"
 JNIEXPORT void JNICALL
+Java_io_github_jqssun_airplay_bridge_NativeBridge_nativeDisconnect(
+        JNIEnv *env, jobject thiz, jlong handle) {
+
+    server_ctx_t *ctx = (server_ctx_t *)(intptr_t)handle;
+    if (!ctx || !ctx->raop) return;
+    raop_remove_known_connections(ctx->raop);
+}
+
+extern "C"
+JNIEXPORT void JNICALL
 Java_io_github_jqssun_airplay_bridge_NativeBridge_nativeDestroy(
         JNIEnv *env, jobject thiz, jlong handle) {
 

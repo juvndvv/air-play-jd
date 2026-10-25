@@ -9,6 +9,8 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.media3.common.Player
+import io.github.jqssun.airplay.AllowedDevice
+import io.github.jqssun.airplay.AllowedDevices
 import io.github.jqssun.airplay.Pref
 import io.github.jqssun.airplay.Prefs
 import io.github.jqssun.airplay.audio.TrackInfo
@@ -102,6 +104,34 @@ class MainViewModel @Inject constructor(app: Application) : AndroidViewModel(app
 
     private val _pinCode = MutableStateFlow<String?>(null)
     val pinCode: StateFlow<String?> = _pinCode.asStateFlow()
+
+    private val _clientRequest = MutableStateFlow<AirPlayService.ClientRequest?>(null)
+    val clientRequest: StateFlow<AirPlayService.ClientRequest?> = _clientRequest.asStateFlow()
+
+    private val _clientName = MutableStateFlow("")
+    val clientName: StateFlow<String> = _clientName.asStateFlow()
+
+    private val _connectionLost = MutableStateFlow<String?>(null)
+    val connectionLost: StateFlow<String?> = _connectionLost.asStateFlow()
+
+    val allowedDevices: StateFlow<List<AllowedDevice>> = prefs.observe { AllowedDevices.read(this) }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, AllowedDevices.read(prefs))
+
+    fun answerClientRequest(allow: Boolean) {
+        service?.answerClientRequest(allow)
+        _clientRequest.value = null
+    }
+
+    fun disconnectSenders() { service?.disconnectSenders() }
+
+    fun dismissConnectionLost() {
+        service?.dismissConnectionLost()
+        _connectionLost.value = null
+    }
+
+    fun removeAllowedDevice(id: String) = AllowedDevices.remove(prefs, id)
+
+    fun clearAllowedDevices() = AllowedDevices.clear(prefs)
 
     private val _videoAspect = MutableStateFlow(16f / 9f)
     val videoAspect: StateFlow<Float> = _videoAspect.asStateFlow()
@@ -377,6 +407,9 @@ class MainViewModel @Inject constructor(app: Application) : AndroidViewModel(app
     fun updateFromService() {
         service?.let {
             _serverState.value = it.serverState.value
+            _clientRequest.value = it.clientRequest.value
+            _clientName.value = it.clientName.value
+            _connectionLost.value = it.connectionLost.value
             _connectionCount.value = it.connectionCount.value
             _videoAspect.value = it.videoAspect.value
             _videoResolution.value = it.videoResolution.value

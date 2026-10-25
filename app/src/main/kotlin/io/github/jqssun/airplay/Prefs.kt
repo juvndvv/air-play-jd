@@ -114,4 +114,6 @@ object Prefs {
     val ADVERTISE_AUDIO = bool("advertise_audio", true, restart = true)
     val LAUNCH_ON_CONNECT = bool("launch_on_connect", true)
     val USB_ONLY = bool("usb_only", false, restart = true)
+    val REQUEST_NEW_DEVICES = bool("request_new_devices", true)
+    val ALLOWED_DEVICES = str("allowed_devices", "[]") { runCatching { org.json.JSONArray(it) }.isSuccess }
 }

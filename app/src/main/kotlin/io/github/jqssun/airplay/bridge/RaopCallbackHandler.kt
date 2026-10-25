@@ -25,4 +25,5 @@ interface RaopCallbackHandler {
     fun onVideoStop()
     // fired per sender GET /playback-info poll; polling starts before /play
     fun onVideoSessionPoll()
+    fun onClientRequest(deviceId: ByteArray, model: ByteArray, name: ByteArray): Boolean
 }

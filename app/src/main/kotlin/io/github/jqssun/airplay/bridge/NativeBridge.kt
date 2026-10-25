@@ -20,6 +20,7 @@ object NativeBridge {
     external fun nativeStart(handle: Long, port: Int): Int
     external fun nativeStop(handle: Long)
     external fun nativeDestroy(handle: Long)
+    external fun nativeDisconnect(handle: Long)
 
     external fun nativeSetDisplaySize(handle: Long, w: Int, h: Int, fps: Int)
     external fun nativeSetPlist(handle: Long, key: String, value: Int)

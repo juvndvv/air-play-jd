@@ -32,6 +32,8 @@ import androidx.core.os.ConfigurationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import androidx.media.app.NotificationCompat as MediaNotificationCompat
+import io.github.jqssun.airplay.AllowedDevice
+import io.github.jqssun.airplay.AllowedDevices
 import io.github.jqssun.airplay.MainActivity
 import io.github.jqssun.airplay.Prefs
 import io.github.jqssun.airplay.R
@@ -58,6 +60,8 @@ import io.github.jqssun.airplay.renderer.VideoRenderer
 import io.github.jqssun.airplay.viewmodel.DebugInfo
 import java.net.NetworkInterface
 import java.security.SecureRandom
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -188,6 +192,16 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
     private val _clientVolTimeout = Runnable { _clientVolDriveEnd() }
 
     var logCallback: ((String) -> Unit)? = null
+
+    private val _clientRequest = MutableStateFlow<ClientRequest?>(null)
+    val clientRequest = _clientRequest.asStateFlow()
+    @Volatile private var _pendingRequest: PendingRequest? = null
+
+    private val _clientName = MutableStateFlow("")
+    val clientName = _clientName.asStateFlow()
+
+    private val _connectionLost = MutableStateFlow<String?>(null)
+    val connectionLost = _connectionLost.asStateFlow()
 
     @Volatile private var _lastPin: String? = null
     var pinCallback: ((String?) -> Unit)? = null
@@ -532,6 +546,8 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
     }
 
     private fun _shutdown() {
+        answerClientRequest(false)
+        _connectionLost.value = null
         audioRenderer.detachEngine()
         if (nativeHandle != 0L) {
             NativeBridge.nativeStop(nativeHandle)
@@ -608,6 +624,20 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
     }
 
     fun stopVideoPlayback() = _endVideoPlayback("AirPlay Video stopped (local)")
+
+    fun disconnectSenders() {
+        if (nativeHandle != 0L) NativeBridge.nativeDisconnect(nativeHandle)
+    }
+
+    fun answerClientRequest(allow: Boolean) {
+        val pending = _pendingRequest ?: return
+        pending.allow = allow
+        pending.latch.countDown()
+    }
+
+    fun dismissConnectionLost() {
+        _connectionLost.value = null
+    }
 
     fun downloadVideo() {
         _videoLocation.value?.let { videoDownloader.start(it) }
@@ -803,6 +833,7 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
     override fun onConnectionDestroy() {
         _connectionCount.value = (_connectionCount.value - 1).coerceAtLeast(0)
         if (_connectionCount.value == 0) {
+            _clientName.value = ""
             // clients may drop without POST /stop; must run before the poll-state reset
             _endVideoPlayback("AirPlay Video stopped (disconnect)")
             // last client gone: release audio output devices to save power
@@ -833,6 +864,39 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
 
     override fun onConnectionReset(reason: Int) {
         log("Connection reset: $reason")
+        _connectionLost.value = _clientName.value
+    }
+
+    override fun onClientRequest(deviceId: ByteArray, model: ByteArray, name: ByteArray): Boolean {
+        val id = deviceId.decodeToString()
+        val modelStr = model.decodeToString()
+        val display = name.decodeToString().ifBlank { modelStr }
+        val allowed = _admit(id, modelStr, display)
+        log("Client request from $display ($modelStr): ${if (allowed) "admitted" else "rejected"}")
+        if (allowed) {
+            _clientName.value = display
+            _connectionLost.value = null
+        }
+        return allowed
+    }
+
+    private fun _admit(id: String, model: String, name: String): Boolean {
+        val now = System.currentTimeMillis()
+        if (id.isNotEmpty() && AllowedDevices.contains(prefs, id)) {
+            AllowedDevices.touch(prefs, id, name, model, now)
+            return true
+        }
+        if (!prefs[Prefs.REQUEST_NEW_DEVICES]) return true
+        val pending = PendingRequest(CountDownLatch(1))
+        _pendingRequest = pending
+        _clientRequest.value = ClientRequest(id, model, name, SystemClock.elapsedRealtime() + CLIENT_REQUEST_TIMEOUT_MS)
+        if (shouldLaunchOnConnect()) launchMainActivity()
+        val answered = pending.latch.await(CLIENT_REQUEST_TIMEOUT_MS, TimeUnit.MILLISECONDS)
+        _pendingRequest = null
+        _clientRequest.value = null
+        val allow = answered && pending.allow
+        if (allow && id.isNotEmpty()) AllowedDevices.upsert(prefs, AllowedDevice(id, name, model, now))
+        return allow
     }
 
     override fun onDisplayPin(pin: String) {
@@ -1170,6 +1234,12 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
         nm.notify(NOTIFICATION_ID, _buildMediaNotification())
     }
 
+    data class ClientRequest(val deviceId: String, val model: String, val name: String, val deadline: Long)
+
+    private class PendingRequest(val latch: CountDownLatch) {
+        @Volatile var allow = false
+    }
+
     enum class ServerState {
         STOPPED,
         RUNNING,
@@ -1190,6 +1260,7 @@ class AirPlayService : LifecycleService(), RaopCallbackHandler, LogListener {
         // shared with dpad/double-tap seeks
         const val VIDEO_SEEK_STEP_MS = 10_000L
         const val VIDEO_POLL_PENDING_TIMEOUT_MS = 3_000L
+        const val CLIENT_REQUEST_TIMEOUT_MS = 30_000L
 
         private const val AUDIO_CONFIG_DEBOUNCE_MS = 500L
         private const val SERVER_RESTART_DEBOUNCE_MS = 500L
